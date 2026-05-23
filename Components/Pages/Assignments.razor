@@ -1,0 +1,96 @@
+@page "/assignments"
+@inject WardSyncService Service
+
+<h1>Assignments</h1>
+
+<EditForm Model="newAssignment" OnValidSubmit="SaveAssignment">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-grid">
+
+        <InputText @bind-Value="newAssignment.Title" placeholder="Assignment Title" />
+
+        <InputText @bind-Value="newAssignment.AssignedLeader"
+                   placeholder="Assigned Leader" />
+
+        <InputText @bind-Value="newAssignment.Organization"
+                   placeholder="Organization" />
+
+        <InputDate @bind-Value="newAssignment.DueDate" />
+
+        <InputSelect @bind-Value="newAssignment.Priority">
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+        </InputSelect>
+
+    </div>
+
+    <InputTextArea @bind-Value="newAssignment.Description"
+                   placeholder="Description" />
+
+    <button class="btn-primary">Add Assignment</button>
+
+</EditForm>
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Leader</th>
+            <th>Organization</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var assignment in assignments)
+        {
+            <tr>
+                <td>@assignment.Title</td>
+                <td>@assignment.AssignedLeader</td>
+                <td>@assignment.Organization</td>
+                <td>@assignment.DueDate.ToShortDateString()</td>
+                <td>@assignment.Priority</td>
+                <td>@assignment.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<AssignmentItem> assignments = new();
+
+    private AssignmentItem newAssignment = new()
+    {
+        DueDate = DateTime.Today.AddDays(7)
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        assignments = await Service.GetAssignmentsAsync();
+    }
+
+    private async Task SaveAssignment()
+    {
+        await Service.AddAssignmentAsync(newAssignment);
+
+        newAssignment = new AssignmentItem()
+        {
+            DueDate = DateTime.Today.AddDays(7)
+        };
+
+        await LoadData();
+    }
+}

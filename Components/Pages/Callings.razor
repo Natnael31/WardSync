@@ -1,0 +1,80 @@
+@page "/callings"
+@inject WardSyncService Service
+
+<h1>Calling Tracker</h1>
+
+<EditForm Model="newCalling" OnValidSubmit="SaveCalling">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-grid">
+
+        <InputText @bind-Value="newCalling.Title" placeholder="Calling Title" />
+        <InputText @bind-Value="newCalling.Organization" placeholder="Organization" />
+        <InputText @bind-Value="newCalling.MemberAssigned" placeholder="Assigned Member" />
+
+        <InputSelect @bind-Value="newCalling.Status">
+            <option>Open</option>
+            <option>Filled</option>
+            <option>Released</option>
+        </InputSelect>
+
+        <InputCheckbox @bind-Value="newCalling.NeedsFollowUp" />
+
+    </div>
+
+    <button class="btn-primary">Add Calling</button>
+</EditForm>
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Organization</th>
+            <th>Member</th>
+            <th>Status</th>
+            <th>Follow-Up</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var calling in callings)
+        {
+            <tr>
+                <td>@calling.Title</td>
+                <td>@calling.Organization</td>
+                <td>@calling.MemberAssigned</td>
+                <td>@calling.Status</td>
+                <td>@calling.NeedsFollowUp</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<Calling> callings = new();
+
+    private Calling newCalling = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        callings = await Service.GetCallingsAsync();
+    }
+
+    private async Task SaveCalling()
+    {
+        await Service.AddCallingAsync(newCalling);
+
+        newCalling = new Calling();
+
+        await LoadData();
+    }
+}

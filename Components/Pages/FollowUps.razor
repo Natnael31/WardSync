@@ -1,0 +1,89 @@
+@page "/followups"
+@inject WardSyncService Service
+
+<h1>Ward Council Follow-Up</h1>
+
+<EditForm Model="newFollowUp" OnValidSubmit="SaveFollowUp">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-grid">
+
+        <InputDate @bind-Value="newFollowUp.MeetingDate" />
+
+        <InputText @bind-Value="newFollowUp.FollowUpItemTitle"
+                   placeholder="Follow-Up Item" />
+
+        <InputText @bind-Value="newFollowUp.AssignedLeader"
+                   placeholder="Assigned Leader" />
+
+        <InputDate @bind-Value="newFollowUp.DueDate" />
+
+    </div>
+
+    <InputTextArea @bind-Value="newFollowUp.CompletionNotes"
+                   placeholder="Notes" />
+
+    <button class="btn-primary">Add Follow-Up</button>
+</EditForm>
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Meeting Date</th>
+            <th>Item</th>
+            <th>Leader</th>
+            <th>Due Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in followUps)
+        {
+            <tr>
+                <td>@item.MeetingDate.ToShortDateString()</td>
+                <td>@item.FollowUpItemTitle</td>
+                <td>@item.AssignedLeader</td>
+                <td>@item.DueDate.ToShortDateString()</td>
+                <td>@item.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<FollowUpItem> followUps = new();
+
+    private FollowUpItem newFollowUp = new()
+    {
+        MeetingDate = DateTime.Today,
+        DueDate = DateTime.Today.AddDays(7)
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        followUps = await Service.GetFollowUpsAsync();
+    }
+
+    private async Task SaveFollowUp()
+    {
+        await Service.AddFollowUpAsync(newFollowUp);
+
+        newFollowUp = new FollowUpItem()
+        {
+            MeetingDate = DateTime.Today,
+            DueDate = DateTime.Today.AddDays(7)
+        };
+
+        await LoadData();
+    }
+}

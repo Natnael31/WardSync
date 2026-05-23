@@ -1,0 +1,43 @@
+@page "/members"
+@inject WardSyncService Service
+
+<h1>Sample Member Directory</h1>
+
+<p>
+    Sample data only. No real ward member information is stored.
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Organization</th>
+            <th>Calling</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var member in members)
+        {
+            <tr>
+                <td>@member.FullName</td>
+                <td>@member.Email</td>
+                <td>@member.Organization</td>
+                <td>@member.CurrentCalling</td>
+                <td>@(member.ActiveStatus ? "Active" : "Inactive")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<Member> members = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        members = await Service.GetMembersAsync();
+    }
+}

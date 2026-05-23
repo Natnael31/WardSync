@@ -1,0 +1,71 @@
+@page "/reports"
+@inject WardSyncService Service
+
+<h1>Reports</h1>
+
+<h2>Overdue Assignments</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Leader</th>
+            <th>Due Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in overdueAssignments)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.AssignedLeader</td>
+                <td>@item.DueDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Open Callings</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Organization</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in openCallings)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Organization</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<AssignmentItem> overdueAssignments = new();
+
+    private List<Calling> openCallings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var assignments = await Service.GetAssignmentsAsync();
+
+        overdueAssignments = assignments
+            .Where(a => a.DueDate < DateTime.Today &&
+                        a.Status != "Completed")
+            .ToList();
+
+        var callings = await Service.GetCallingsAsync();
+
+        openCallings = callings
+            .Where(c => c.Status == "Open")
+            .ToList();
+    }
+}
