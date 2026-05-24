@@ -1,77 +1,113 @@
-﻿@page "/"
-@inject WardSyncService Service
+@page "/"
 
-<PageTitle>Dashboard</PageTitle>
+<PageTitle>WardSync</PageTitle>
 
-<h1>WardSync Dashboard</h1>
+<div class="home-page">
+    <section class="home-hero" aria-labelledby="home-title">
+        <img src="/images/WardSync_picture.webp"
+             alt="Latter-day Saint meetinghouse with red brick, white steeple, lawn, and blue sky"
+             class="hero-meetinghouse-image" />
 
-<div class="dashboard-grid">
+        <div class="home-hero-overlay">
+            <div class="home-hero-text">
+                <p class="home-kicker">Ward and Branch Leadership Workspace</p>
+                <h1 id="home-title">WardSync</h1>
+                <p class="home-tagline">Organize callings, assignments, and follow-up in one place.</p>
+                <p class="home-summary">
+                    WardSync helps ward and branch leaders track callings, assignments, service needs,
+                    due dates, progress, notes, and completion status so council work is easier to
+                    organize and follow through on.
+                </p>
 
-    <div class="card">
-        <h3>Open Assignments</h3>
-        <p class="stat">@openAssignments</p>
+                <nav class="home-actions" aria-label="Primary home page links">
+                    <a class="home-button home-button-primary" href="/callings">Callings</a>
+                    <a class="home-button" href="/assignments">Assignments</a>
+                    <a class="home-button" href="/followups">Follow-Up</a>
+                    <a class="home-button" href="/members">Members</a>
+                    <a class="home-button" href="/reports">Reports</a>
+                    <a class="home-button home-button-login" href="/login">Login</a>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <div class="hero-stat-grid" aria-label="WardSync quick benefits">
+        <article class="hero-stat-card">
+            <span class="hero-stat-icon" aria-hidden="true">1</span>
+            <h2>Track open needs</h2>
+            <p>Keep service needs and assignments visible.</p>
+        </article>
+
+        <article class="hero-stat-card">
+            <span class="hero-stat-icon" aria-hidden="true">2</span>
+            <h2>Review follow-up</h2>
+            <p>See what still needs attention.</p>
+        </article>
+
+        <article class="hero-stat-card">
+            <span class="hero-stat-icon" aria-hidden="true">3</span>
+            <h2>Prepare for council</h2>
+            <p>Bring clear updates into meetings.</p>
+        </article>
     </div>
 
-    <div class="card">
-        <h3>Completed Assignments</h3>
-        <p class="stat">@completedAssignments</p>
-    </div>
+    <section class="home-section" aria-labelledby="features-title">
+        <div class="section-heading">
+            <p class="section-kicker">Built for follow-through</p>
+            <h2 id="features-title">Key Features</h2>
+            <p>
+                Simple tools for keeping leadership work visible, organized, and ready for the next
+                ward council conversation.
+            </p>
+        </div>
 
-    <div class="card">
-        <h3>Overdue Items</h3>
-        <p class="stat overdue">@overdueAssignments</p>
-    </div>
+        <div class="feature-grid">
+            <article class="feature-card">
+                <span class="feature-icon feature-icon-clipboard" aria-hidden="true"></span>
+                <h3>Track Callings</h3>
+                <p>Keep calling status, organization, assigned member, and follow-up needs easy to review.</p>
+            </article>
 
-    <div class="card">
-        <h3>Open Callings</h3>
-        <p class="stat">@openCallings</p>
-    </div>
+            <article class="feature-card">
+                <span class="feature-icon feature-icon-list" aria-hidden="true"></span>
+                <h3>Manage Assignments</h3>
+                <p>Record assignments, leaders, priorities, due dates, notes, and current progress.</p>
+            </article>
 
+            <article class="feature-card">
+                <span class="feature-icon feature-icon-followup" aria-hidden="true"></span>
+                <h3>Track Follow-Up</h3>
+                <p>See what needs attention and help ward council members stay aligned on next steps.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-icon feature-icon-report" aria-hidden="true"></span>
+                <h3>View Reports</h3>
+                <p>Review open callings, overdue assignments, and other summaries for leadership meetings.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="home-section home-useful" aria-labelledby="useful-title">
+        <div>
+            <h2 id="useful-title">Why WardSync Is Useful</h2>
+            <p>
+                Church leadership work often moves through meetings, messages, notes, and quick
+                hallway conversations. WardSync gives leaders one simple place to see what is open,
+                who is helping, what needs follow-up, and what has already been completed.
+            </p>
+        </div>
+    </section>
+
+    <section class="home-section target-users" aria-labelledby="users-title">
+        <h2 id="users-title">Who WardSync Is For</h2>
+
+        <ul class="target-user-list">
+            <li>Bishoprics and branch presidencies</li>
+            <li>Clerks and executive secretaries</li>
+            <li>Auxiliary presidencies</li>
+            <li>Ward council members</li>
+            <li>Approved read-only users</li>
+        </ul>
+    </section>
 </div>
-
-<h2>Upcoming Assignments</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Leader</th>
-            <th>Due Date</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var assignment in assignments.Take(5))
-        {
-            <tr>
-                <td>@assignment.Title</td>
-                <td>@assignment.AssignedLeader</td>
-                <td>@assignment.DueDate.ToShortDateString()</td>
-                <td>@assignment.Status</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@code {
-
-    private List<AssignmentItem> assignments = new();
-    private List<Calling> callings = new();
-
-    private int openAssignments;
-    private int completedAssignments;
-    private int overdueAssignments;
-    private int openCallings;
-
-    protected override async Task OnInitializedAsync()
-    {
-        assignments = await Service.GetAssignmentsAsync();
-        callings = await Service.GetCallingsAsync();
-
-        openAssignments = assignments.Count(a => a.Status == "Open");
-        completedAssignments = assignments.Count(a => a.Status == "Completed");
-        overdueAssignments = assignments.Count(a => a.DueDate < DateTime.Today && a.Status != "Completed");
-        openCallings = callings.Count(c => c.Status == "Open");
-    }
-}
