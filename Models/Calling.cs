@@ -8,4 +8,8 @@ public class Calling
     public string MemberAssigned { get; set; } = "";
     public string Status { get; set; } = "Open";
     public bool NeedsFollowUp { get; set; }
+    public DateTime? DateExtended { get; set; }
+    public DateTime? DateSustained { get; set; }
+    public DateTime? DateReleased { get; set; }
+    public string Notes { get; set; } = "";
 }

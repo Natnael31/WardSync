@@ -10,4 +10,6 @@ public class AssignmentItem
     public DateTime DueDate { get; set; } = DateTime.Today;
     public string Priority { get; set; } = "Medium";
     public string Status { get; set; } = "Open";
+    public string Notes { get; set; } = "";
+    public DateTime? CompletionDate { get; set; }
 }
