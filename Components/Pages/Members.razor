@@ -1,6 +1,6 @@
 @page "/members"
 @inject WardSyncService Service
-
+@attribute [Authorize(Roles = "Admin,Leader,Viewer")]
 <h1>Sample Member Directory</h1>
 
 <p>

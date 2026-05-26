@@ -1,4 +1,6 @@
 @page "/assignments"
+
+@attribute [Authorize(Roles = "Admin,Leader")]
 @inject WardSyncService Service
 
 <h1>Assignments</h1>

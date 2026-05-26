@@ -1,4 +1,6 @@
 @page "/callings"
+
+@attribute [Authorize(Roles = "Admin")]
 @inject WardSyncService Service
 
 <h1>Calling Tracker</h1>

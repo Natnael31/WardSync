@@ -1,6 +1,6 @@
 @page "/followups"
 @inject WardSyncService Service
-
+@attribute [Authorize(Roles = "Admin,Leader")]
 <h1>Ward Council Follow-Up</h1>
 
 <EditForm Model="newFollowUp" OnValidSubmit="SaveFollowUp">
