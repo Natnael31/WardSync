@@ -1,0 +1,112 @@
+@page "/callings/edit/{id:int}"
+@rendermode InteractiveServer
+@inject WardSyncService Service
+@inject NavigationManager Navigation
+
+<h1>Edit Calling</h1>
+
+@if (calling == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="card">
+        <div class="form-grid">
+            <div>
+                <label>Calling Title:*</label>
+                <input type="text" @bind="calling.Title" @bind:event="oninput" />
+            </div>
+
+            <div>
+                <label>Organization:</label>
+                <input type="text" @bind="calling.Organization" @bind:event="oninput" />
+            </div>
+
+            <div>
+                <label>Assigned Member:</label>
+                <input type="text" @bind="calling.MemberAssigned" @bind:event="oninput" />
+            </div>
+
+            <div>
+                <label>Status:</label>
+                <select @bind="calling.Status">
+                    <option value="Open">Open</option>
+                    <option value="Filled">Filled</option>
+                    <option value="Released">Released</option>
+                </select>
+            </div>
+
+            <div>
+                <label>
+                    <input type="checkbox" @bind="calling.NeedsFollowUp" />
+                    Needs Follow-Up
+                </label>
+            </div>
+
+            <div>
+                <label>Date Extended:</label>
+                <input type="date" @bind="calling.DateExtended" />
+            </div>
+
+            <div>
+                <label>Date Sustained:</label>
+                <input type="date" @bind="calling.DateSustained" />
+            </div>
+
+            <div>
+                <label>Date Released:</label>
+                <input type="date" @bind="calling.DateReleased" />
+            </div>
+
+            <div>
+                <label>Notes:</label>
+                <textarea @bind="calling.Notes" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn-primary" @onclick="UpdateCalling">Save Changes</button>
+            <button class="btn-secondary" @onclick="Cancel">Cancel</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Calling? calling;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var allCallings = await Service.GetCallingsAsync();
+        calling = allCallings.FirstOrDefault(c => c.Id == Id);
+
+        if (calling == null)
+        {
+            Navigation.NavigateTo("/callings");
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task UpdateCalling()
+    {
+        if (calling == null || string.IsNullOrWhiteSpace(calling.Title))
+        {
+            return;
+        }
+
+        await Service.UpdateCallingAsync(calling);
+        Navigation.NavigateTo("/callings");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/callings");
+    }
+}
