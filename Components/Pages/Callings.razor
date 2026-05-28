@@ -1,82 +1,282 @@
 @page "/callings"
-
-@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
 @inject WardSyncService Service
+@inject NavigationManager Navigation
+
+@attribute [Authorize(Roles = "Admin,Leader")]
 
 <h1>Calling Tracker</h1>
 
-<EditForm Model="newCalling" OnValidSubmit="SaveCalling">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@if (showForm)
+{
+    <div class="card" style="margin-bottom: 2rem;">
+        <h3>@(isEditing ? "Edit Calling" : "Create New Calling")</h3>
+        <div class="form-grid">
+            <div>
+                <label>Calling Title:*</label>
+                <input type="text" @bind="currentCalling.Title" @bind:event="oninput" />
+            </div>
 
-    <div class="form-grid">
+            <div>
+                <label>Organization:</label>
+                <input type="text" @bind="currentCalling.Organization" @bind:event="oninput" />
+            </div>
 
-        <InputText @bind-Value="newCalling.Title" placeholder="Calling Title" />
-        <InputText @bind-Value="newCalling.Organization" placeholder="Organization" />
-        <InputText @bind-Value="newCalling.MemberAssigned" placeholder="Assigned Member" />
+            <div>
+                <label>Assigned Member:</label>
+                <input type="text" @bind="currentCalling.MemberAssigned" @bind:event="oninput" />
+            </div>
 
-        <InputSelect @bind-Value="newCalling.Status">
-            <option>Open</option>
-            <option>Filled</option>
-            <option>Released</option>
-        </InputSelect>
+            <div>
+                <label>Status:</label>
+                <select @bind="currentCalling.Status">
+                    <option value="Open">Open</option>
+                    <option value="Filled">Filled</option>
+                    <option value="Released">Released</option>
+                </select>
+            </div>
 
-        <InputCheckbox @bind-Value="newCalling.NeedsFollowUp" />
+            <div>
+                <label>
+                    <input type="checkbox" @bind="currentCalling.NeedsFollowUp" />
+                    Needs Follow-Up
+                </label>
+            </div>
 
+            <div>
+                <label>Date Extended:</label>
+                <input type="date" @bind="currentCalling.DateExtended" />
+            </div>
+
+            <div>
+                <label>Date Sustained:</label>
+                <input type="date" @bind="currentCalling.DateSustained" />
+            </div>
+
+            <div>
+                <label>Date Released:</label>
+                <input type="date" @bind="currentCalling.DateReleased" />
+            </div>
+
+            <div>
+                <label>Notes:</label>
+                <textarea @bind="currentCalling.Notes" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" @onclick="SaveCalling">@(isEditing ? "Update Calling" : "Create Calling")</button>
+            <button class="btn-secondary" @onclick="CancelForm">Cancel</button>
+        </div>
     </div>
+}
 
-    <button class="btn-primary">Add Calling</button>
-</EditForm>
+<div style="margin-bottom: 1rem;">
+    <button class="btn-primary" @onclick="ShowCreateForm">+ Add New Calling</button>
+    <button class="btn-secondary" @onclick="RefreshData" style="margin-left: 0.5rem;">Refresh</button>
+</div>
 
-<hr />
+@if (isLoading)
+{
+    <div class="loading">
+        <p>Loading callings...</p>
+    </div>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        <p><strong>Error:</strong> @errorMessage</p>
+    </div>
+}
+else if (callings.Any())
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Organization</th>
+                    <th>Member</th>
+                    <th>Status</th>
+                    <th>Follow-Up</th>
+                    <th>Date Extended</th>
+                    <th>Date Sustained</th>
+                    <th>Date Released</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var calling in callings)
+                {
+                    <tr>
+                        <td>@calling.Title</td
+                        <td>@calling.Organization</td
+                        <td>@calling.MemberAssigned</td
+                        <td>@calling.Status</td
+                        <td>@(calling.NeedsFollowUp ? "Yes" : "No")</td
+                        <td>@(calling.DateExtended?.ToString("yyyy-MM-dd") ?? "-")</td
+                        <td>@(calling.DateSustained?.ToString("yyyy-MM-dd") ?? "-")</td
+                        <td>@(calling.DateReleased?.ToString("yyyy-MM-dd") ?? "-")</td
+                        <td>@calling.Notes</td
+                        <td>
+                            <button class="btn-edit" @onclick="() => EditCalling(calling)">Edit</button>
+                            <button class="btn-delete" @onclick="() => DeleteCalling(calling.Id)">Delete</button>
+                         </td
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="alert alert-info">
+        <small>Total callings: @callings.Count</small>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <p>No callings found. Click "Add New Calling" to get started!</p>
+    </div>
+}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Organization</th>
-            <th>Member</th>
-            <th>Status</th>
-            <th>Follow-Up</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var calling in callings)
-        {
-            <tr>
-                <td>@calling.Title</td>
-                <td>@calling.Organization</td>
-                <td>@calling.MemberAssigned</td>
-                <td>@calling.Status</td>
-                <td>@calling.NeedsFollowUp</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (showDeleteConfirmation)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this calling?</p>
+            <p><strong>@callingToDelete?.Title</strong> - @callingToDelete?.Organization</p>
+            <div class="button-group">
+                <button class="btn-delete" @onclick="ConfirmDelete">Yes, Delete</button>
+                <button class="btn-secondary" @onclick="CancelDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
-
     private List<Calling> callings = new();
+    private Calling currentCalling = new();
+    private Calling? callingToDelete = null;
+    private bool showForm = false;
+    private bool isEditing = false;
+    private bool showDeleteConfirmation = false;
+    private bool isLoading = true;
+    private string? errorMessage = null;
 
-    private Calling newCalling = new();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+        }
+    }
 
-    protected override async Task OnInitializedAsync()
+    private async Task RefreshData()
     {
         await LoadData();
     }
 
     private async Task LoadData()
     {
-        callings = await Service.GetCallingsAsync();
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            StateHasChanged();
+            
+            callings = await Service.GetCallingsAsync();
+            
+            isLoading = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ShowCreateForm()
+    {
+        currentCalling = new Calling();
+        isEditing = false;
+        showForm = true;
+        StateHasChanged();
+    }
+
+    private void EditCalling(Calling calling)
+    {
+        currentCalling = new Calling
+        {
+            Id = calling.Id,
+            Title = calling.Title,
+            Organization = calling.Organization,
+            MemberAssigned = calling.MemberAssigned,
+            Status = calling.Status,
+            NeedsFollowUp = calling.NeedsFollowUp,
+            DateExtended = calling.DateExtended,
+            DateSustained = calling.DateSustained,
+            DateReleased = calling.DateReleased,
+            Notes = calling.Notes
+        };
+        isEditing = true;
+        showForm = true;
+        StateHasChanged();
     }
 
     private async Task SaveCalling()
     {
-        await Service.AddCallingAsync(newCalling);
+        if (string.IsNullOrWhiteSpace(currentCalling.Title))
+        {
+            return;
+        }
 
-        newCalling = new Calling();
+        if (isEditing)
+        {
+            await Service.UpdateCallingAsync(currentCalling);
+        }
+        else
+        {
+            await Service.AddCallingAsync(currentCalling);
+        }
 
+        showForm = false;
+        currentCalling = new Calling();
         await LoadData();
+    }
+
+    private void CancelForm()
+    {
+        showForm = false;
+        currentCalling = new Calling();
+        isEditing = false;
+        StateHasChanged();
+    }
+
+    private void DeleteCalling(int id)
+    {
+        callingToDelete = callings.FirstOrDefault(c => c.Id == id);
+        showDeleteConfirmation = true;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (callingToDelete != null)
+        {
+            await Service.DeleteCallingAsync(callingToDelete.Id);
+            showDeleteConfirmation = false;
+            callingToDelete = null;
+            await LoadData();
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false;
+        callingToDelete = null;
+        StateHasChanged();
     }
 }
