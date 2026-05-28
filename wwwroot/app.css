@@ -242,6 +242,7 @@ textarea {
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 14px;
     box-shadow: 0 18px 38px rgba(4, 19, 34, 0.28);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
 }
 
@@ -734,6 +735,7 @@ textarea {
     right: 0;
     bottom: 0;
     background-color: rgba(15, 39, 66, 0.85);
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
