@@ -1,0 +1,45 @@
+@page "/assignments/details/{id:int}"
+@rendermode InteractiveServer
+
+@attribute [Authorize(Roles = "Admin,Leader")]
+@inject WardSyncService Service
+
+<h1>Assignment Details</h1>
+
+@if (assignment is null)
+{
+    <p>Assignment not found.</p>
+    <a class="btn-secondary" href="/assignments">Back to Assignments</a>
+}
+else
+{
+    <div class="card">
+        <h2>@assignment.Title</h2>
+
+        <p><strong>Description:</strong> @assignment.Description</p>
+        <p><strong>Notes:</strong> @assignment.Notes</p>
+        <p><strong>Assigned Leader:</strong> @assignment.AssignedLeader</p>
+        <p><strong>Organization:</strong> @assignment.Organization</p>
+        <p><strong>Due Date:</strong> @assignment.DueDate.ToShortDateString()</p>
+        <p><strong>Priority:</strong> @assignment.Priority</p>
+        <p><strong>Status:</strong> @assignment.Status</p>
+        <p><strong>Completion Date:</strong> @(assignment.CompletionDate?.ToShortDateString() ?? "Not completed")</p>
+    </div>
+
+    <div class="button-row">
+        <a class="btn-edit" href="/assignments/edit/@assignment.Id">Edit</a>
+        <a class="btn-secondary" href="/assignments">Back to Assignments</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private AssignmentItem? assignment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        assignment = await Service.GetAssignmentByIdAsync(Id);
+    }
+}
