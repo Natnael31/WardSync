@@ -1,7 +1,6 @@
 @page "/reports"
 @inject WardSyncService Service
-@attribute [Authorize(Roles = "Admin")]
-<h1>Reports</h1>
+@attribute [Authorize(Roles = "Admin, Leader")]
 
 <h2>Overdue Assignments</h2>
 
