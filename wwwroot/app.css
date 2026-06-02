@@ -980,3 +980,32 @@ textarea {
 .date-section {
     margin-top: 1rem;
 }
+
+.validation-summary-errors {
+    background: #fde7e4;
+    border-left: 4px solid var(--ws-danger);
+    border-radius: 8px;
+    color: #7a271a;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.validation-summary-errors ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.validation-summary-errors li {
+    margin: 0.25rem 0;
+}
+
+.validation-message {
+    color: var(--ws-danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.input-validation-error {
+    border-color: var(--ws-danger) !important;
+}

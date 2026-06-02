@@ -11,63 +11,89 @@
 {
     <div class="card" style="margin-bottom: 2rem;">
         <h3>@(isEditing ? "Edit Calling" : "Create New Calling")</h3>
-        <div class="form-grid">
-            <div>
-                <label>Calling Title:*</label>
-                <input type="text" @bind="currentCalling.Title" @bind:event="oninput" />
+        
+        <EditForm EditContext="editContext" OnValidSubmit="SaveCalling" OnInvalidSubmit="HandleInvalidSubmit">
+            <DataAnnotationsValidator />
+            
+            <!-- Validation Summary - Shows all errors at the top like Assignment page -->
+            <div class="validation-summary-errors" role="alert" style="display: @(formError ? "block" : "none")">
+                <ul>
+                    @if (formError)
+                    {
+                        @foreach (var error in validationErrors)
+                        {
+                            <li>@error</li>
+                        }
+                    }
+                </ul>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-field">
+                    <label>Calling Title</label>
+                    <InputText @bind-Value="currentCalling.Title" />
+                    <ValidationMessage For="@(() => currentCalling.Title)" />
+                </div>
+
+                <div class="form-field">
+                    <label>Organization</label>
+                    <InputText @bind-Value="currentCalling.Organization" />
+                    <ValidationMessage For="@(() => currentCalling.Organization)" />
+                </div>
+
+                <div class="form-field">
+                    <label>Assigned Member</label>
+                    <InputText @bind-Value="currentCalling.MemberAssigned" />
+                    <ValidationMessage For="@(() => currentCalling.MemberAssigned)" />
+                </div>
+
+                <div class="form-field">
+                    <label>Status</label>
+                    <InputSelect @bind-Value="currentCalling.Status">
+                        <option value="Open">Open</option>
+                        <option value="Filled">Filled</option>
+                        <option value="Released">Released</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => currentCalling.Status)" />
+                </div>
+
+                <div class="form-field">
+                    <label>
+                        <InputCheckbox @bind-Value="currentCalling.NeedsFollowUp" />
+                        Needs Follow-Up
+                    </label>
+                </div>
+
+                <div class="form-field">
+                    <label>Date Extended</label>
+                    <InputDate @bind-Value="currentCalling.DateExtended" />
+                    <ValidationMessage For="@(() => currentCalling.DateExtended)" />
+                </div>
+
+                <div class="form-field">
+                    <label>Date Sustained</label>
+                    <InputDate @bind-Value="currentCalling.DateSustained" />
+                    <ValidationMessage For="@(() => currentCalling.DateSustained)" />
+                </div>
+
+                <div class="form-field">
+                    <label>Date Released</label>
+                    <InputDate @bind-Value="currentCalling.DateReleased" />
+                    <ValidationMessage For="@(() => currentCalling.DateReleased)" />
+                </div>
+
+                <div class="form-field">
+                    <label>Notes</label>
+                    <InputTextArea @bind-Value="currentCalling.Notes" rows="3" />
+                    <ValidationMessage For="@(() => currentCalling.Notes)" />
+                </div>
             </div>
 
-            <div>
-                <label>Organization:</label>
-                <input type="text" @bind="currentCalling.Organization" @bind:event="oninput" />
+            <div class="button-group">
+                <button type="submit" class="btn-primary">@(isEditing ? "Update Calling" : "+ Add Calling")</button>
+                <button type="button" class="btn-secondary" @onclick="CancelForm">Cancel</button>
             </div>
-
-            <div>
-                <label>Assigned Member:</label>
-                <input type="text" @bind="currentCalling.MemberAssigned" @bind:event="oninput" />
-            </div>
-
-            <div>
-                <label>Status:</label>
-                <select @bind="currentCalling.Status">
-                    <option value="Open">Open</option>
-                    <option value="Filled">Filled</option>
-                    <option value="Released">Released</option>
-                </select>
-            </div>
-
-            <div>
-                <label>
-                    <input type="checkbox" @bind="currentCalling.NeedsFollowUp" />
-                    Needs Follow-Up
-                </label>
-            </div>
-
-            <div>
-                <label>Date Extended:</label>
-                <input type="date" @bind="currentCalling.DateExtended" />
-            </div>
-
-            <div>
-                <label>Date Sustained:</label>
-                <input type="date" @bind="currentCalling.DateSustained" />
-            </div>
-
-            <div>
-                <label>Date Released:</label>
-                <input type="date" @bind="currentCalling.DateReleased" />
-            </div>
-
-            <div>
-                <label>Notes:</label>
-                <textarea @bind="currentCalling.Notes" rows="3"></textarea>
-            </div>
-        </div>
-
-        <div class="button-group">
-            <button class="btn-primary" @onclick="SaveCalling">@(isEditing ? "Update Calling" : "Create Calling")</button>
-            <button class="btn-secondary" @onclick="CancelForm">Cancel</button>
-        </div>
+        </EditForm>
     </div>
 }
 
@@ -158,10 +184,13 @@ else
     private List<Calling> callings = new();
     private Calling currentCalling = new();
     private Calling? callingToDelete = null;
+    private EditContext? editContext;
     private bool showForm = false;
     private bool isEditing = false;
     private bool showDeleteConfirmation = false;
     private bool isLoading = true;
+    private bool formError = false;
+    private List<string> validationErrors = new();
     private string? errorMessage = null;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -203,6 +232,16 @@ else
         currentCalling = new Calling();
         isEditing = false;
         showForm = true;
+        formError = false;
+        validationErrors.Clear();
+        editContext = new EditContext(currentCalling);
+        
+        editContext.OnFieldChanged += (sender, e) =>
+        {
+            formError = !editContext.Validate();
+            StateHasChanged();
+        };
+        
         StateHasChanged();
     }
 
@@ -223,16 +262,38 @@ else
         };
         isEditing = true;
         showForm = true;
+        formError = false;
+        validationErrors.Clear();
+        editContext = new EditContext(currentCalling);
+        
+        editContext.OnFieldChanged += (sender, e) =>
+        {
+            formError = !editContext.Validate();
+            StateHasChanged();
+        };
+        
+        StateHasChanged();
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        formError = true;
+        validationErrors.Clear();
+        
+        var validationMessages = editContext?.GetValidationMessages();
+        if (validationMessages != null)
+        {
+            validationErrors.AddRange(validationMessages);
+        }
+        
         StateHasChanged();
     }
 
     private async Task SaveCalling()
     {
-        if (string.IsNullOrWhiteSpace(currentCalling.Title))
-        {
-            return;
-        }
-
+        formError = false;
+        validationErrors.Clear();
+        
         if (isEditing)
         {
             await Service.UpdateCallingAsync(currentCalling);
@@ -252,6 +313,8 @@ else
         showForm = false;
         currentCalling = new Calling();
         isEditing = false;
+        formError = false;
+        validationErrors.Clear();
         StateHasChanged();
     }
 
