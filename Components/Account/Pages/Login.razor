@@ -24,25 +24,37 @@
                 <hr />
                 <ValidationSummary class="text-danger" role="alert" />
 
+                @* Email Input Field *@
                 <div class="form-floating mb-3">
                     <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="name@example.com" />
                     <label for="Input.Email" class="form-label">Email</label>
                     <ValidationMessage For="() => Input.Email" class="text-danger" />
                 </div>
 
+                @* Password Input Field with Interactive Show/Hide Icon *@
                 <div class="mb-3">
                     <div class="input-group">
                         <div class="form-floating flex-grow-1">
-                            <InputText type="password" @bind-Value="Input.Password" id="password-field" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                            <InputText type="password"
+                                @bind-Value="Input.Password"
+                                id="password-field"
+                                class="form-control"
+                                autocomplete="current-password"
+                                aria-required="true"
+                                placeholder="password" />
                             <label for="password-field" class="form-label">Password</label>
                         </div>
-                        <button class="btn btn-outline-secondary" type="button" id="toggle-btn" onclick="togglePasswordVisibility()" style="z-index: 5;">
-                            Show
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                aria-label="Toggle password visibility"
+                                onclick="togglePasswordVisibility('password-field', this)">
+                            <i class="bi bi-eye"></i>
                         </button>
                     </div>
                     <ValidationMessage For="() => Input.Password" class="text-danger mt-1" />
                 </div>
 
+                @* Remember Me Checkbox *@
                 <div class="checkbox mb-3">
                     <label class="form-label">
                         <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
@@ -53,10 +65,12 @@
                     <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
                 </div>
                 <hr />
+                @* Passkey Login Option - for future
                 <div class="d-flex flex-column">
                     <span class="text-secondary mx-auto mt-2">OR</span>
                     <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
                 </div>
+                *@
                 <hr />
                 <div>
                     <p>
@@ -72,6 +86,7 @@
             </EditForm>
         </section>
     </div>
+    @* Commented out until we configure external authentication providers
     <div class="col-lg-4 col-lg-offset-2">
         <section>
             <h3>Use another service to log in.</h3>
@@ -79,21 +94,12 @@
             <ExternalLoginPicker />
         </section>
     </div>
+    *@
 </div>
 
 @code {
     private string? errorMessage;
     private EditContext editContext = default!;
-
-    private bool showPassword = false;
-
-    private string PasswordInputType =>
-        showPassword ? "text" : "password";
-
-    private void TogglePassword()
-    {
-        showPassword = !showPassword;
-    }
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -110,9 +116,9 @@
 
         editContext = new EditContext(Input);
 
-        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        if (HttpContext != null &&
+            HttpMethods.IsGet(HttpContext.Request.Method))
         {
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         }
     }
@@ -182,18 +188,3 @@
         public PasskeyInputModel? Passkey { get; set; }
     }
 }
-
-<script>
-    function togglePasswordVisibility() {
-        const passwordField = document.getElementById('password-field');
-        const toggleBtn = document.getElementById('toggle-btn');
-
-        if (passwordField.type === 'password') {
-            passwordField.type = 'text';
-            toggleBtn.textContent = 'Hide';
-        } else {
-            passwordField.type = 'password';
-            toggleBtn.textContent = 'Show';
-        }
-    }
-</script>
