@@ -55,13 +55,50 @@
                 <td>@assignment.Status</td>
                 <td>
                     <a class="btn-view" href="/assignments/details/@assignment.Id">View</a>
+
                     <a class="btn-edit" href="/assignments/edit/@assignment.Id">Edit</a>
-                    <a class="btn-delete" href="/assignments/delete/@assignment.Id">Delete</a>
+
+                    <button type="button"
+                            class="btn-delete"
+                            @onclick="() => ShowDeletePopup(assignment)">
+                        Delete
+                    </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@if (showDeleteConfirmation && assignmentToDelete is not null)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>Delete Assignment</h3>
+
+            <p>Are you sure you want to delete this assignment?</p>
+
+            <p><strong>Title:</strong> @assignmentToDelete.Title</p>
+            <p><strong>Assigned Leader:</strong> @assignmentToDelete.AssignedLeader</p>
+            <p><strong>Organization:</strong> @assignmentToDelete.Organization</p>
+            <p><strong>Due Date:</strong> @assignmentToDelete.DueDate.ToShortDateString()</p>
+            <p><strong>Status:</strong> @assignmentToDelete.Status</p>
+
+            <div class="button-row">
+                <button type="button"
+                        class="btn-delete"
+                        @onclick="ConfirmDelete">
+                    Yes, Delete
+                </button>
+
+                <button type="button"
+                        class="btn-secondary"
+                        @onclick="CancelDelete">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     private List<AssignmentItem> assignments = new();
@@ -69,6 +106,10 @@
     private string searchText = string.Empty;
 
     private string statusFilter = string.Empty;
+
+    private bool showDeleteConfirmation;
+
+    private AssignmentItem? assignmentToDelete;
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,5 +144,30 @@
 
             return query.OrderBy(a => a.DueDate);
         }
+    }
+
+    private void ShowDeletePopup(AssignmentItem assignment)
+    {
+        assignmentToDelete = assignment;
+        showDeleteConfirmation = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (assignmentToDelete is not null)
+        {
+            await Service.DeleteAssignmentAsync(assignmentToDelete.Id);
+
+            showDeleteConfirmation = false;
+            assignmentToDelete = null;
+
+            await LoadAssignments();
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false;
+        assignmentToDelete = null;
     }
 }
