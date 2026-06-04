@@ -1,70 +1,233 @@
 @page "/reports"
 @inject WardSyncService Service
+
 @attribute [Authorize(Roles = "Admin, Leader")]
 
-<h2>Overdue Assignments</h2>
+<PageTitle>Reports</PageTitle>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Leader</th>
-            <th>Due Date</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in overdueAssignments)
-        {
-            <tr>
-                <td>@item.Title</td>
-                <td>@item.AssignedLeader</td>
-                <td>@item.DueDate.ToShortDateString()</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<h1>Reports</h1>
 
 <h2>Open Callings</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Organization</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in openCallings)
-        {
+@if (openCallings.Count == 0)
+{
+    <p>No open callings.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@item.Title</td>
-                <td>@item.Organization</td>
+                <th>Title</th>
+                <th>Organization</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var calling in openCallings)
+            {
+                <tr>
+                    <td>@calling.Title</td>
+                    <td>@calling.Organization</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Callings Needing Follow-Up</h2>
+
+@if (callingsNeedingFollowUp.Count == 0)
+{
+    <p>No callings require follow-up.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Organization</th>
+                <th>Member Assigned</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var calling in callingsNeedingFollowUp)
+            {
+                <tr>
+                    <td>@calling.Title</td>
+                    <td>@calling.Organization</td>
+                    <td>@calling.MemberAssigned</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Assignments by Leader</h2>
+
+@if (openAssignmentsByLeader.Count == 0)
+{
+    <p>No open assignments.</p>
+}
+else
+{
+    @foreach (var group in openAssignmentsByLeader)
+    {
+        <h3>@group.Key</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Organization</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in group.Value)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Organization</td>
+                        <td>@item.DueDate.ToShortDateString()</td>
+                        <td>@item.Priority</td>
+                        <td>@item.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+<h2>Overdue Assignments</h2>
+
+@if (overdueAssignments.Count == 0)
+{
+    <p>No overdue assignments.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Leader</th>
+                <th>Organization</th>
+                <th>Due Date</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in overdueAssignments)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.AssignedLeader</td>
+                    <td>@item.Organization</td>
+                    <td>@item.DueDate.ToShortDateString()</td>
+                    <td>@item.Priority</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Completed Assignments</h2>
+
+@if (completedAssignments.Count == 0)
+{
+    <p>No completed assignments.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Leader</th>
+                <th>Organization</th>
+                <th>Completion Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in completedAssignments)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.AssignedLeader</td>
+                    <td>@item.Organization</td>
+                    <td>@(item.CompletionDate.HasValue ? item.CompletionDate.Value.ToShortDateString() : "—")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Overdue Follow-Up Items</h2>
+
+@if (overdueFollowUps.Count == 0)
+{
+    <p>No overdue follow-up items.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Leader</th>
+                <th>Related Family</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in overdueFollowUps)
+            {
+                <tr>
+                    <td>@item.FollowUpItemTitle</td>
+                    <td>@item.AssignedLeader</td>
+                    <td>@(item.PrivacyFlag ? "— Confidential —" : item.RelatedFamily)</td>
+                    <td>@item.DueDate.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
-
-    private List<AssignmentItem> overdueAssignments = new();
-
     private List<Calling> openCallings = new();
+    private List<Calling> callingsNeedingFollowUp = new();
+    private List<AssignmentItem> overdueAssignments = new();
+    private List<AssignmentItem> completedAssignments = new();
+    private Dictionary<string, List<AssignmentItem>> openAssignmentsByLeader = new();
+    private List<FollowUpItem> overdueFollowUps = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var assignments = await Service.GetAssignmentsAsync();
-
-        overdueAssignments = assignments
-            .Where(a => a.DueDate < DateTime.Today &&
-                        a.Status != "Completed")
-            .ToList();
-
         var callings = await Service.GetCallingsAsync();
+        openCallings = callings.Where(c => c.Status == "Open").ToList();
+        callingsNeedingFollowUp = callings.Where(c => c.NeedsFollowUp).ToList();
 
-        openCallings = callings
-            .Where(c => c.Status == "Open")
+        var assignments = await Service.GetAssignmentsAsync();
+        overdueAssignments = assignments
+            .Where(a => a.DueDate < DateTime.Today && a.Status != "Completed")
+            .OrderBy(a => a.DueDate)
+            .ToList();
+        completedAssignments = assignments
+            .Where(a => a.Status == "Completed")
+            .OrderByDescending(a => a.CompletionDate)
+            .ToList();
+        openAssignmentsByLeader = assignments
+            .Where(a => a.Status != "Completed")
+            .GroupBy(a => a.AssignedLeader)
+            .OrderBy(g => g.Key)
+            .ToDictionary(g => g.Key, g => g.OrderBy(a => a.DueDate).ToList());
+
+        var followUps = await Service.GetFollowUpsAsync();
+        overdueFollowUps = followUps
+            .Where(f => f.DueDate < DateTime.Today && f.Status != "Completed")
+            .OrderBy(f => f.DueDate)
             .ToList();
     }
 }
