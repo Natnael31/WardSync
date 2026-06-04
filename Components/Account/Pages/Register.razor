@@ -74,11 +74,11 @@
                         <label for="confirm-password-field" class="form-label">Confirm Password</label>
                     </div>
                     <button class="btn btn-outline-secondary"
-                                type="button"
-                                aria-label="Toggle password visibility"
-                                onclick="togglePasswordVisibility('password-field', this)">
-                            <i class="bi bi-eye"></i>
-                        </button>
+                            type="button"
+                            aria-label="Toggle password visibility"
+                            onclick="togglePasswordVisibility('confirm-password-field', this)">
+                        <i class="bi bi-eye"></i>
+                    </button>
                 </div>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger mt-1" />
             </div>
