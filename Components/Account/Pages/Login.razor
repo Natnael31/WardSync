@@ -1,4 +1,4 @@
-﻿@page "/Account/Login"
+@page "/Account/Login"
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
@@ -101,6 +101,16 @@
     private string? errorMessage;
     private EditContext editContext = default!;
 
+    private bool showPassword = false;
+
+    private string PasswordInputType =>
+        showPassword ? "text" : "password";
+
+    private void TogglePassword()
+    {
+        showPassword = !showPassword;
+    }
+
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
@@ -188,3 +198,32 @@
         public PasskeyInputModel? Passkey { get; set; }
     }
 }
+
+<script>
+    function togglePasswordVisibility(fieldIdOrElem, btnOrElem) {
+        const field = typeof fieldIdOrElem === 'string' ? document.getElementById(fieldIdOrElem) : fieldIdOrElem;
+        const btn = typeof btnOrElem === 'string' ? document.getElementById(btnOrElem) : btnOrElem;
+
+        if (!field || !btn) return;
+
+        if (field.type === 'password') {
+            field.type = 'text';
+            const icon = btn.querySelector && btn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                btn.textContent = btn.textContent.replace('Show', 'Hide');
+            }
+        } else {
+            field.type = 'password';
+            const icon = btn.querySelector && btn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                btn.textContent = btn.textContent.replace('Hide', 'Show');
+            }
+        }
+    }
+</script>

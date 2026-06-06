@@ -99,14 +99,13 @@
         </div>
     </div>
 }
-
 @code {
     private List<AssignmentItem> assignments = new();
 
     private string searchText = string.Empty;
 
     private string statusFilter = string.Empty;
-
+    
     private bool showDeleteConfirmation;
 
     private AssignmentItem? assignmentToDelete;
@@ -143,31 +142,31 @@
             }
 
             return query.OrderBy(a => a.DueDate);
+            }
         }
-    }
 
-    private void ShowDeletePopup(AssignmentItem assignment)
-    {
-        assignmentToDelete = assignment;
-        showDeleteConfirmation = true;
-    }
-
-    private async Task ConfirmDelete()
-    {
-        if (assignmentToDelete is not null)
+        private void ShowDeletePopup(AssignmentItem assignment)
         {
-            await Service.DeleteAssignmentAsync(assignmentToDelete.Id);
+            assignmentToDelete = assignment;
+            showDeleteConfirmation = true;
+        }
 
+        private async Task ConfirmDelete()
+        {
+            if (assignmentToDelete is not null)
+            {
+                await Service.DeleteAssignmentAsync(assignmentToDelete.Id);
+
+                showDeleteConfirmation = false;
+                assignmentToDelete = null;
+
+                await LoadAssignments();
+            }
+        }
+
+        private void CancelDelete()
+        {
             showDeleteConfirmation = false;
             assignmentToDelete = null;
-
-            await LoadAssignments();
         }
     }
-
-    private void CancelDelete()
-    {
-        showDeleteConfirmation = false;
-        assignmentToDelete = null;
-    }
-}

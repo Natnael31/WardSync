@@ -1,4 +1,4 @@
-﻿@page "/Account/Register"
+@page "/Account/Register"
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -193,3 +193,33 @@
         public string ConfirmPassword { get; set; } = "";
     }
 }
+
+<script>
+    function togglePasswordVisibility(fieldIdOrElem, btnOrElem) {
+        const field = typeof fieldIdOrElem === 'string' ? document.getElementById(fieldIdOrElem) : fieldIdOrElem;
+        const btn = typeof btnOrElem === 'string' ? document.getElementById(btnOrElem) : btnOrElem;
+
+        if (!field || !btn) return;
+
+        if (field.type === 'password') {
+            field.type = 'text';
+            // swap icon if present
+            const icon = btn.querySelector && btn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                btn.textContent = btn.textContent.replace('Show', 'Hide');
+            }
+        } else {
+            field.type = 'password';
+            const icon = btn.querySelector && btn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                btn.textContent = btn.textContent.replace('Hide', 'Show');
+            }
+        }
+    }
+</script>
