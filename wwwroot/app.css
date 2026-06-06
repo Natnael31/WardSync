@@ -76,6 +76,11 @@ h1:focus {
     color: var(--ws-danger);
 }
 
+.breadcrumbs {
+    padding-left: 1rem;
+    margin-top: 1rem;
+}
+
 .blazor-error-boundary {
     background: var(--ws-danger);
     border-radius: 8px;
@@ -1043,4 +1048,3 @@ textarea {
     line-height: 1.5;
     font-size: 0.95rem;
 }
-
