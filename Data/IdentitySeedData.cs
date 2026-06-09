@@ -8,8 +8,11 @@ public static class IdentitySeedData
     {
         using var scope = serviceProvider.CreateScope();
 
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager =
+            scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        var userManager =
+            scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
         string[] roles = ["Admin", "Leader", "Viewer"];
 
@@ -21,9 +24,23 @@ public static class IdentitySeedData
             }
         }
 
-        await CreateUserIfMissing(userManager, "admin@wardsync.com", "Admin123!", "Admin");
-        await CreateUserIfMissing(userManager, "leader@wardsync.com", "Leader123!", "Leader");
-        await CreateUserIfMissing(userManager, "viewer@wardsync.com", "Viewer123!", "Viewer");
+        await CreateUserIfMissing(
+            userManager,
+            "admin@wardsync.com",
+            "Admin123!",
+            "Admin");
+
+        await CreateUserIfMissing(
+            userManager,
+            "leader@wardsync.com",
+            "Leader123!",
+            "Leader");
+
+        await CreateUserIfMissing(
+            userManager,
+            "viewer@wardsync.com",
+            "Viewer123!",
+            "Viewer");
     }
 
     private static async Task CreateUserIfMissing(
@@ -43,7 +60,15 @@ public static class IdentitySeedData
                 EmailConfirmed = true
             };
 
-            await userManager.CreateAsync(user, password);
+            var result = await userManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                throw new Exception(
+                    $"Failed to create user {email}: " +
+                    string.Join(", ",
+                        result.Errors.Select(e => e.Description)));
+            }
         }
 
         if (!await userManager.IsInRoleAsync(user, role))
