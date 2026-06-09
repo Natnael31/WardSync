@@ -31,7 +31,7 @@ Directory.CreateDirectory(dataFolder);
 
 var dbPath = Path.Combine(dataFolder, "app.db");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath};Cache=Shared"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -79,9 +79,10 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
+    await IdentitySeedData.SeedRolesAndUsersAsync(scope.ServiceProvider);
 }
 
-await IdentitySeedData.SeedRolesAndUsersAsync(app.Services);
+
 
 app.MapGet("/assignments/calendar/{id:int}", async (
     int id,

@@ -30,6 +30,20 @@
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
 
+            @* First Name Input Field *@
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.FirstName" id="Input.FirstName" class="form-control" aria-required="true" placeholder="John" />
+                <label for="Input.FirstName">First Name</label>
+                <ValidationMessage For="() => Input.FirstName" class="text-danger" />
+            </div>
+
+            @* Last Name Input Field *@
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.LastName" id="Input.LastName" class="form-control" aria-required="true" placeholder="Doe" />
+                <label for="Input.LastName">Last Name</label>
+                <ValidationMessage For="() => Input.LastName" class="text-danger" />
+            </div>
+
             @* Email Input Field *@
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
@@ -51,11 +65,11 @@
                         <label for="password-field" class="form-label">Password</label>
                     </div>
                     <button class="btn btn-outline-secondary"
-                                type="button"
-                                aria-label="Toggle password visibility"
-                                onclick="togglePasswordVisibility('password-field', this)">
-                            <i class="bi bi-eye"></i>
-                        </button>
+                            type="button"
+                            aria-label="Toggle password visibility"
+                            onclick="togglePasswordVisibility('password-field', this)">
+                        <i class="bi bi-eye"></i>
+                    </button>
                 </div>
                 <ValidationMessage For="() => Input.Password" class="text-danger mt-1" />
             </div>
@@ -86,15 +100,6 @@
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
     </div>
-    @* Commented out until we configure external authentication providers
-    <div class="col-lg-4 col-lg-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div>
-    *@
 </div>
 
 @code {
@@ -117,9 +122,15 @@
     {
         var user = CreateUser();
 
+        // Map properties out of your user interface data models and onto your custom tracking entity!
+        user.FirstName = Input.FirstName;
+        user.LastName = Input.LastName;
+        user.IsApproved = false; // new users have to be approved by an admin before they can sign in
+
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
         var result = await UserManager.CreateAsync(user, Input.Password);
 
         if (!result.Succeeded)
@@ -147,8 +158,7 @@
         }
         else
         {
-            await SignInManager.SignInAsync(user, isPersistent: false);
-            RedirectManager.RedirectTo(ReturnUrl);
+            RedirectManager.RedirectTo("Account/Login", new() { ["Message"] = "Registration successful! Your account is pending administrator approval." });
         }
     }
 
@@ -176,6 +186,16 @@
 
     private sealed class InputModel
     {
+        [Required(ErrorMessage = "First name is required.")]
+        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters.")]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; } = "";
+
+        [Required(ErrorMessage = "Last name is required.")]
+        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters.")]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; } = "";
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
@@ -203,7 +223,6 @@
 
         if (field.type === 'password') {
             field.type = 'text';
-            // swap icon if present
             const icon = btn.querySelector && btn.querySelector('i');
             if (icon) {
                 icon.classList.remove('bi-eye');

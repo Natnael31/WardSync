@@ -1,4 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using WardSync.Data
+
 
 <div class="page">
     <div class="sidebar">
@@ -26,8 +31,14 @@
     </div>
 </footer>
 
-<div id="blazor-error-ui" data-nosnippet>
+<div id="blazor-error-ui" data-nosnippet">
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <AdminApprovalAlert @rendermode="InteractiveServer" />
+    </Authorized>
+</AuthorizeView>
