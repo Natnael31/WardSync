@@ -12,10 +12,11 @@
     <div class="card" style="margin-bottom: 2rem;">
         <h3>@(isEditing ? "Edit Calling" : "Create New Calling")</h3>
         
+        <!-- EditForm with validation - OnValidSubmit only fires when all validation passes -->
         <EditForm EditContext="editContext" OnValidSubmit="SaveCalling" OnInvalidSubmit="HandleInvalidSubmit">
             <DataAnnotationsValidator />
             
-            <!-- Validation Summary - Shows all errors at the top like Assignment page -->
+            <!-- Validation summary - displays all validation errors at the top -->
             <div class="validation-summary-errors" role="alert" style="display: @(formError ? "block" : "none")">
                 <ul>
                     @if (formError)
@@ -29,6 +30,7 @@
             </div>
             
             <div class="form-grid">
+                <!-- Each form field shows individual validation message below it -->
                 <div class="form-field">
                     <label>Calling Title</label>
                     <InputText @bind-Value="currentCalling.Title" />
@@ -102,7 +104,7 @@
     <button class="btn-secondary" @onclick="RefreshData" style="margin-left: 0.5rem;">Refresh</button>
 </div>
 
-<!-- Filter Row - Added like assignments page -->
+<!-- Filter row for searching and filtering callings -->
 <div class="filter-row">
     <div class="search-box">
         <span class="search-icon">🔍</span>
@@ -149,6 +151,7 @@ else if (FilteredCallings.Any())
                 </tr>
             </thead>
             <tbody>
+                <!-- Display filtered callings with edit and delete buttons -->
                 @foreach (var calling in FilteredCallings)
                 {
                     <tr>
@@ -181,6 +184,7 @@ else
     </div>
 }
 
+<!-- Delete confirmation modal -->
 @if (showDeleteConfirmation)
 {
     <div class="modal-overlay">
@@ -197,6 +201,7 @@ else
 }
 
 @code {
+    // Data and state properties
     private List<Calling> callings = new();
     private Calling currentCalling = new();
     private Calling? callingToDelete = null;
@@ -209,9 +214,11 @@ else
     private List<string> validationErrors = new();
     private string? errorMessage = null;
     
+    // Filter properties
     private string searchText = string.Empty;
     private string statusFilter = string.Empty;
 
+    // Load data when page first renders
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -225,6 +232,7 @@ else
         await LoadData();
     }
 
+    // Fetch all callings from the database
     private async Task LoadData()
     {
         try
@@ -246,6 +254,7 @@ else
         }
     }
 
+    // Filter callings based on search text and status filter
     private IEnumerable<Calling> FilteredCallings
     {
         get
@@ -271,6 +280,7 @@ else
         }
     }
 
+    // Initialize form for creating a new calling
     private void ShowCreateForm()
     {
         currentCalling = new Calling();
@@ -280,6 +290,7 @@ else
         validationErrors.Clear();
         editContext = new EditContext(currentCalling);
         
+        // Real-time validation as user types
         editContext.OnFieldChanged += (sender, e) =>
         {
             formError = !editContext.Validate();
@@ -289,6 +300,7 @@ else
         StateHasChanged();
     }
 
+    // Populate form with existing calling data for editing
     private void EditCalling(Calling calling)
     {
         currentCalling = new Calling
@@ -319,6 +331,7 @@ else
         StateHasChanged();
     }
 
+    // Collect all validation errors when form submission fails
     private void HandleInvalidSubmit()
     {
         formError = true;
@@ -333,6 +346,7 @@ else
         StateHasChanged();
     }
 
+    // Save or update calling based on isEditing flag
     private async Task SaveCalling()
     {
         formError = false;
@@ -362,6 +376,7 @@ else
         StateHasChanged();
     }
 
+    // Show delete confirmation modal
     private void DeleteCalling(int id)
     {
         callingToDelete = callings.FirstOrDefault(c => c.Id == id);
@@ -369,6 +384,7 @@ else
         StateHasChanged();
     }
 
+    // Perform actual deletion after confirmation
     private async Task ConfirmDelete()
     {
         if (callingToDelete != null)
