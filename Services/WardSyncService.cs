@@ -4,21 +4,26 @@ using WardSync.Models;
 
 namespace WardSync.Services;
 
+// Service class responsible for handling all database operations
+// related to Callings, Assignments, Follow-Ups, and Members.
 public class WardSyncService(ApplicationDbContext db)
 {
     // =========================
     // CALLINGS CRUD
     // =========================
 
+    // Retrieve all callings from the database
     public Task<List<Calling>> GetCallingsAsync() =>
         db.Callings.ToListAsync();
 
+    // Add a new calling
     public async Task AddCallingAsync(Calling calling)
     {
         db.Callings.Add(calling);
         await db.SaveChangesAsync();
     }
 
+    // Update an existing calling
     public async Task UpdateCallingAsync(Calling calling)
     {
         var existingCalling = await db.Callings.FindAsync(calling.Id);
@@ -39,6 +44,7 @@ public class WardSyncService(ApplicationDbContext db)
         }
     }
 
+    // Delete a calling by ID
     public async Task DeleteCallingAsync(int id)
     {
         var calling = await db.Callings.FindAsync(id);
@@ -55,20 +61,24 @@ public class WardSyncService(ApplicationDbContext db)
     // ASSIGNMENTS CRUD
     // =========================
 
+    // Retrieve all assignments
     public Task<List<AssignmentItem>> GetAssignmentsAsync() =>
         db.Assignments.ToListAsync();
 
+    // Retrieve a single assignment by ID
     public async Task<AssignmentItem?> GetAssignmentByIdAsync(int id)
     {
         return await db.Assignments.FindAsync(id);
     }
 
+    // Add a new assignment
     public async Task AddAssignmentAsync(AssignmentItem assignment)
     {
         db.Assignments.Add(assignment);
         await db.SaveChangesAsync();
     }
 
+    // Update an existing assignment
     public async Task UpdateAssignmentAsync(AssignmentItem assignment)
     {
         var existingAssignment = await db.Assignments.FindAsync(assignment.Id);
@@ -82,7 +92,6 @@ public class WardSyncService(ApplicationDbContext db)
             existingAssignment.DueDate = assignment.DueDate;
             existingAssignment.Priority = assignment.Priority;
             existingAssignment.Status = assignment.Status;
-
             existingAssignment.Notes = assignment.Notes;
             existingAssignment.CompletionDate = assignment.CompletionDate;
 
@@ -90,6 +99,7 @@ public class WardSyncService(ApplicationDbContext db)
         }
     }
 
+    // Delete an assignment by ID
     public async Task DeleteAssignmentAsync(int id)
     {
         var assignment = await db.Assignments.FindAsync(id);
@@ -102,23 +112,27 @@ public class WardSyncService(ApplicationDbContext db)
     }
 
     // =========================
-    // FOLLOW UPS
+    // FOLLOW UPS CRUD
     // =========================
 
+    // Retrieve all follow-up items
     public Task<List<FollowUpItem>> GetFollowUpsAsync() =>
         db.FollowUpItems.ToListAsync();
 
+    // Retrieve a follow-up item by ID
     public async Task<FollowUpItem?> GetFollowUpByIdAsync(int id)
     {
         return await db.FollowUpItems.FindAsync(id);
     }
 
+    // Add a new follow-up item
     public async Task AddFollowUpAsync(FollowUpItem followUp)
     {
         db.FollowUpItems.Add(followUp);
         await db.SaveChangesAsync();
     }
 
+    // Update an existing follow-up item
     public async Task UpdateFollowUpAsync(FollowUpItem followUp)
     {
         var existingFollowUp = await db.FollowUpItems.FindAsync(followUp.Id);
@@ -138,6 +152,7 @@ public class WardSyncService(ApplicationDbContext db)
         }
     }
 
+    // Delete a follow-up item by ID
     public async Task DeleteFollowUpAsync(int id)
     {
         var followUp = await db.FollowUpItems.FindAsync(id);
@@ -153,6 +168,7 @@ public class WardSyncService(ApplicationDbContext db)
     // MEMBERS
     // =========================
 
+    // Retrieve all ward members
     public Task<List<Member>> GetMembersAsync() =>
         db.Members.ToListAsync();
 }
