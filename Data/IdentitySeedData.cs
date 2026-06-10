@@ -57,7 +57,8 @@ public static class IdentitySeedData
             {
                 UserName = email,
                 Email = email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                IsApproved = true
             };
 
             var result = await userManager.CreateAsync(user, password);
@@ -69,6 +70,11 @@ public static class IdentitySeedData
                     string.Join(", ",
                         result.Errors.Select(e => e.Description)));
             }
+        }
+        else if (!user.IsApproved)
+        {
+            user.IsApproved = true;
+            await userManager.UpdateAsync(user);
         }
 
         if (!await userManager.IsInRoleAsync(user, role))
