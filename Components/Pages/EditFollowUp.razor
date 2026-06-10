@@ -96,6 +96,7 @@ else
 
         var selectedFollowUp = await Service.GetFollowUpByIdAsync(Id);
 
+        // Private follow-ups should not be opened by leaders through a direct URL.
         if (selectedFollowUp is null || selectedFollowUp.PrivacyFlag && !isAdmin)
         {
             followUpForm = null;
@@ -109,6 +110,7 @@ else
     {
         if (followUpForm is not null)
         {
+            // Check required fields before saving changes back to the database.
             validationMessage = ValidateFollowUp(followUpForm);
 
             if (!string.IsNullOrWhiteSpace(validationMessage))

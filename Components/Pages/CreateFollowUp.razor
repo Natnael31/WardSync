@@ -84,6 +84,7 @@
 
     private async Task SaveFollowUp()
     {
+        // The form model is simple, so this method keeps the required-field checks in one place.
         validationMessage = ValidateFollowUp(followUpForm);
 
         if (!string.IsNullOrWhiteSpace(validationMessage))

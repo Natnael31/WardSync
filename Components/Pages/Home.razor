@@ -1,6 +1,7 @@
 @page "/"
 @rendermode InteractiveServer
 @inject WardSyncService Service
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>WardSync</PageTitle>
 
@@ -42,7 +43,7 @@
                                 </Authorized>
                             </AuthorizeView>
 
-                            <AuthorizeView Roles="Admin" Context="reportAuth">
+                            <AuthorizeView Roles="Admin,Leader" Context="reportAuth">
                                 <Authorized>
                                     <a class="home-button" href="/reports">Reports</a>
                                 </Authorized>
@@ -97,29 +98,25 @@
         </div>
 
         <div class="feature-grid">
-            <article class="feature-card">
-                <span class="feature-icon feature-icon-clipboard" aria-hidden="true"></span>
-                <h3>Track Callings</h3>
-                <p>Keep calling status, organization, assigned member, and follow-up needs easy to review.</p>
-            </article>
-
-            <article class="feature-card">
-                <span class="feature-icon feature-icon-list" aria-hidden="true"></span>
-                <h3>Manage Assignments</h3>
-                <p>Record assignments, leaders, priorities, due dates, notes, and current progress.</p>
-            </article>
-
-            <article class="feature-card">
-                <span class="feature-icon feature-icon-followup" aria-hidden="true"></span>
-                <h3>Track Follow-Up</h3>
-                <p>See what needs attention and help ward council members stay aligned on next steps.</p>
-            </article>
-
-            <article class="feature-card">
-                <span class="feature-icon feature-icon-report" aria-hidden="true"></span>
-                <h3>View Reports</h3>
-                <p>Review open callings, overdue assignments, and other summaries for leadership meetings.</p>
-            </article>
+            @foreach (var card in VisibleFeatureCards)
+            {
+                @if (card.CanOpen)
+                {
+                    <a class="feature-card feature-card-link" href="@card.Href">
+                        <span class="@card.IconClass" aria-hidden="true"></span>
+                        <h3>@card.Title</h3>
+                        <p>@card.Description</p>
+                    </a>
+                }
+                else
+                {
+                    <article class="feature-card">
+                        <span class="@card.IconClass" aria-hidden="true"></span>
+                        <h3>@card.Title</h3>
+                        <p>@card.Description</p>
+                    </article>
+                }
+            }
         </div>
     </section>
 
@@ -164,9 +161,28 @@
     private int FollowUpsNeeded { get; set; }
     private int OpenCallings { get; set; }
 
+    private bool isSignedIn;
+    private bool isAdmin;
+    private bool isLeader;
+    private bool isViewer;
+
+    private List<FeatureCard> VisibleFeatureCards =>
+        FeatureCards
+            .Where(card => !isSignedIn || card.CanUse(isAdmin, isLeader, isViewer))
+            .Select(card => card with { CanOpen = isSignedIn && card.CanUse(isAdmin, isLeader, isViewer) })
+            .ToList();
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Guests see all cards for learning, but signed-in users only see cards their role can open.
+        isSignedIn = user.Identity?.IsAuthenticated == true;
+        isAdmin = user.IsInRole("Admin");
+        isLeader = user.IsInRole("Leader");
+        isViewer = user.IsInRole("Viewer");
+
         assignments = await Service.GetAssignmentsAsync();
         callings = await Service.GetCallingsAsync();
 
@@ -195,6 +211,44 @@
         ShowNotification = false;
         await InvokeAsync(StateHasChanged);
     }
+
+    private sealed record FeatureCard(
+        string Title,
+        string Description,
+        string IconClass,
+        string Href,
+        Func<bool, bool, bool, bool> CanUse)
+    {
+        public bool CanOpen { get; init; }
+    }
+
+    private static readonly List<FeatureCard> FeatureCards =
+    [
+        new(
+            "Track Callings",
+            "Keep calling status, organization, assigned member, and follow-up needs easy to review.",
+            "feature-icon feature-icon-clipboard",
+            "/callings",
+            (isAdmin, _, _) => isAdmin),
+        new(
+            "Manage Assignments",
+            "Record assignments, leaders, priorities, due dates, notes, and current progress.",
+            "feature-icon feature-icon-list",
+            "/assignments",
+            (isAdmin, isLeader, _) => isAdmin || isLeader),
+        new(
+            "Track Follow-Up",
+            "See what needs attention and help ward council members stay aligned on next steps.",
+            "feature-icon feature-icon-followup",
+            "/followups",
+            (isAdmin, isLeader, _) => isAdmin || isLeader),
+        new(
+            "View Reports",
+            "Review open callings, overdue assignments, and other summaries for leadership meetings.",
+            "feature-icon feature-icon-report",
+            "/reports",
+            (isAdmin, isLeader, _) => isAdmin || isLeader)
+    ];
 }
 
 <AuthorizeView Roles="Admin">

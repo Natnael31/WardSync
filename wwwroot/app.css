@@ -587,6 +587,7 @@ textarea {
 
 .feature-card {
     position: relative;
+    display: block;
     min-height: 100%;
     background: linear-gradient(180deg, #f8fbff 0%, #edf6f9 100%);
     border: 1px solid #cfdfea;
@@ -595,6 +596,17 @@ textarea {
     padding: 1.45rem;
     overflow: hidden;
     transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.feature-card-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.feature-card-link:hover,
+.feature-card-link:focus {
+    color: inherit;
+    text-decoration: none;
 }
 
 .feature-card::before {
@@ -1321,6 +1333,42 @@ textarea {
     transform: none;
 }
 
+.report-export {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--ws-white);
+    border: 1px solid var(--ws-gray-200);
+    border-left: 5px solid var(--ws-green);
+    border-radius: 8px;
+    box-shadow: 0 10px 26px rgba(15, 39, 66, 0.08);
+    margin-bottom: 1.5rem;
+    padding: 1.15rem 1.25rem;
+}
+
+.report-export h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.15rem;
+}
+
+.report-export p {
+    margin: 0;
+    color: var(--ws-gray-600);
+}
+
+.report-export-status {
+    margin-top: 0.35rem !important;
+    color: var(--ws-green-dark) !important;
+    font-weight: 700;
+}
+
+.report-export-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
 .report-nav {
     display: flex;
     flex-wrap: wrap;
@@ -1498,6 +1546,15 @@ textarea {
     .report-filters .btn-secondary {
         width: 100%;
         min-width: 0;
+    }
+
+    .report-export {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .report-export-actions {
+        flex-direction: column;
     }
 
     .report-section-header h2 {

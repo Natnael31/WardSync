@@ -98,6 +98,7 @@
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // Admins can see private follow-ups; leaders only see regular follow-ups.
         isAdmin = authState.User.IsInRole("Admin");
 
         await LoadFollowUps();
@@ -138,6 +139,7 @@
 
     private void DeleteFollowUp(FollowUpItem followUp)
     {
+        // Keep the item around while the confirmation modal is open.
         followUpToDelete = followUp;
         showDeleteConfirmation = true;
     }

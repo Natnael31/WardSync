@@ -1,7 +1,8 @@
 @page "/reports"
 @rendermode InteractiveServer
 @inject WardSyncService Service
-@attribute [Authorize(Roles = "Admin, Leader")]
+@inject IJSRuntime JS
+@attribute [Authorize(Roles = "Admin,Leader")]
 
 <PageTitle>Reports</PageTitle>
 
@@ -74,6 +75,28 @@
         </button>
     </div>
 </div>
+
+<section class="report-export" aria-labelledby="export-title">
+    <div>
+        <h2 id="export-title">Export Report</h2>
+        <p>
+            Download or copy a simple text summary using the current filters.
+        </p>
+        @if (!string.IsNullOrWhiteSpace(copyMessage))
+        {
+            <p class="report-export-status">@copyMessage</p>
+        }
+    </div>
+
+    <div class="report-export-actions">
+        <button type="button" class="btn-secondary" @onclick="DownloadReport">
+            Download Report
+        </button>
+        <button type="button" class="btn-secondary" @onclick="CopyReport">
+            Copy Report
+        </button>
+    </div>
+</section>
 
 @{
     // Snapshot computed properties once so each section uses the same filtered results
@@ -346,6 +369,7 @@
     private string statusFilter = string.Empty;
     private DateTime? dueDateFrom;
     private DateTime? dueDateTo;
+    private string copyMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -399,6 +423,7 @@
         statusFilter = string.Empty;
         dueDateFrom = null;
         dueDateTo = null;
+        copyMessage = string.Empty;
     }
 
     private string EmptyMessage(string what) =>
@@ -464,4 +489,164 @@
             .Where(f => f.DueDate < DateTime.Today && f.Status != "Completed")
             .OrderBy(f => f.DueDate)
             .ToList();
+
+    private async Task DownloadReport()
+    {
+        var reportText = BuildReportText();
+        var fileName = $"WardSync-Report-{DateTime.Today:yyyy-MM-dd}.txt";
+
+        await JS.InvokeVoidAsync("wardSyncReports.downloadTextFile", fileName, reportText);
+        copyMessage = "Report downloaded.";
+    }
+
+    private async Task CopyReport()
+    {
+        await JS.InvokeVoidAsync("wardSyncReports.copyText", BuildReportText());
+        copyMessage = "Report copied.";
+    }
+
+    private string BuildReportText()
+    {
+        var openCallings = OpenCallings;
+        var callingsNeedingFollowUp = CallingsNeedingFollowUp;
+        var openAssignmentsByLeader = OpenAssignmentsByLeader;
+        var overdueAssignments = OverdueAssignments;
+        var completedAssignments = CompletedAssignments;
+        var overdueFollowUps = OverdueFollowUps;
+
+        var report = new System.Text.StringBuilder();
+
+        report.AppendLine("WardSync Report");
+        report.AppendLine($"Created: {DateTime.Now:g}");
+        report.AppendLine($"Filters: {FilterSummary}");
+        report.AppendLine();
+
+        report.AppendLine("Summary");
+        report.AppendLine($"- Open callings: {openCallings.Count}");
+        report.AppendLine($"- Callings needing follow-up: {callingsNeedingFollowUp.Count}");
+        report.AppendLine($"- Open assignments: {openAssignmentsByLeader.Sum(g => g.Value.Count)}");
+        report.AppendLine($"- Overdue assignments: {overdueAssignments.Count}");
+        report.AppendLine($"- Completed assignments: {completedAssignments.Count}");
+        report.AppendLine($"- Overdue follow-up items: {overdueFollowUps.Count}");
+        report.AppendLine();
+
+        AppendCallingSection(report, "Open Callings", openCallings);
+        AppendCallingSection(report, "Callings Needing Follow-Up", callingsNeedingFollowUp);
+
+        report.AppendLine("Assignments by Leader");
+        if (openAssignmentsByLeader.Count == 0)
+        {
+            report.AppendLine("- None");
+        }
+        else
+        {
+            foreach (var group in openAssignmentsByLeader)
+            {
+                report.AppendLine($"- {group.Key}: {group.Value.Count}");
+                foreach (var item in group.Value)
+                {
+                    report.AppendLine($"  - {item.Title} | {item.Organization} | Due {item.DueDate:d} | {item.Priority} | {item.Status}");
+                }
+            }
+        }
+        report.AppendLine();
+
+        AppendAssignmentSection(report, "Overdue Assignments", overdueAssignments);
+        AppendAssignmentSection(report, "Completed Assignments", completedAssignments);
+
+        report.AppendLine("Overdue Follow-Up Items");
+        if (overdueFollowUps.Count == 0)
+        {
+            report.AppendLine("- None");
+        }
+        else
+        {
+            foreach (var item in overdueFollowUps)
+            {
+                // Keep private family names out of exported reports too.
+                var family = item.PrivacyFlag ? "Confidential" : item.RelatedFamily;
+                report.AppendLine($"- {item.FollowUpItemTitle} | {item.AssignedLeader} | {family} | Due {item.DueDate:d}");
+            }
+        }
+
+        return report.ToString();
+    }
+
+    private string FilterSummary
+    {
+        get
+        {
+            if (!HasActiveFilters)
+            {
+                return "None";
+            }
+
+            var filters = new List<string>();
+
+            if (!string.IsNullOrEmpty(organizationFilter))
+            {
+                filters.Add($"Organization: {organizationFilter}");
+            }
+
+            if (!string.IsNullOrEmpty(leaderFilter))
+            {
+                filters.Add($"Leader: {leaderFilter}");
+            }
+
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                filters.Add($"Status: {statusFilter}");
+            }
+
+            if (dueDateFrom.HasValue)
+            {
+                filters.Add($"Due from: {dueDateFrom.Value:d}");
+            }
+
+            if (dueDateTo.HasValue)
+            {
+                filters.Add($"Due to: {dueDateTo.Value:d}");
+            }
+
+            return string.Join("; ", filters);
+        }
+    }
+
+    private static void AppendCallingSection(System.Text.StringBuilder report, string title, List<Calling> items)
+    {
+        report.AppendLine(title);
+
+        if (items.Count == 0)
+        {
+            report.AppendLine("- None");
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                report.AppendLine($"- {item.Title} | {item.Organization} | {item.Status}");
+            }
+        }
+
+        report.AppendLine();
+    }
+
+    private static void AppendAssignmentSection(System.Text.StringBuilder report, string title, List<AssignmentItem> items)
+    {
+        report.AppendLine(title);
+
+        if (items.Count == 0)
+        {
+            report.AppendLine("- None");
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                report.AppendLine($"- {item.Title} | {item.AssignedLeader} | {item.Organization} | Due {item.DueDate:d} | {item.Status}");
+            }
+        }
+
+        report.AppendLine();
+    }
 }

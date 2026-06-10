@@ -69,7 +69,7 @@
                     @* Edit assignment *@
                     <a class="btn-edit" href="/assignments/edit/@assignment.Id">Edit</a>
 
-                    @* Display delete confirmation dialog *@
+                    @* Ask first so an assignment is not deleted by one wrong click. *@
                     <button type="button"
                             class="btn-delete"
                             @onclick="() => ShowDeletePopup(assignment)">
@@ -171,7 +171,7 @@
         }
     }
 
-    // Display delete confirmation popup
+    // Save the selected row so the modal can show exactly what will be deleted.
     private void ShowDeletePopup(AssignmentItem assignment)
     {
         assignmentToDelete = assignment;
@@ -192,7 +192,7 @@
         }
     }
 
-    // Close delete confirmation popup without deleting
+    // Close the modal and leave the assignment list unchanged.
     private void CancelDelete()
     {
         showDeleteConfirmation = false;
