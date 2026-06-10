@@ -122,12 +122,6 @@ dotnet restore
 This command installs all dependencies required for the application.
 
 
-# Run Database Migrations
-
-
-# Update the Database
-
-
 # Running the Program
 
 To run the application locally, follow these steps:
@@ -150,7 +144,7 @@ Database setup will be updated once finalized.
 - Trello
 Trello was used as a project management and planning tool to organize tasks and track project progress. We used boards, lists, and cards to assign responsibilities, monitor deadlines, and manage software development activities. Trello helped improve team communication and ensured that development tasks were completed in an organized manner.
 
-{Trello link: place the link here}
+Trello link: https://trello.com/b/UkTMelSr/wardsync
 
 
 
@@ -179,4 +173,129 @@ The application also used built-in .NET libraries to support common tasks such a
 {xxPlace the final video link here:}
 
 
+# User Guide
+This guide explains how to access the system and use its main features.
+
+- Logging In
+1.	Open the WardSync website in your web browser.
+2.	Click the Login button on the home page.
+3.	Enter your registered email address and password.
+4.	Click Sign In.
+5.	After successful authentication, you will be redirected to the Dashboard.
+If you do not have an account, select Register and complete the registration form before logging in.
+
+- Using the Dashboard
+The Dashboard provides an overview of important ward information.
+
+Dashboard Features
+1. 	View pending assignments.
+2.	View overdue assignments.
+3.	View open callings.
+4.	Access quick links to manage callings and assignments.
+5.	Receive notifications and reminders for important tasks.
+
+Navigation
+Use the navigation menu to access:
+1.	Dashboard
+2.	Callings
+3.	Assignments
+4.	Reports
+5.	Logout
+
+Managing Callings
+The Callings section allows leaders to track ward positions and assignments.
+View Callings
+1.	Select Callings from the navigation menu.
+2.	Review the list of current callings.
+3.	Use search or filtering options if available.
+
+Add a Calling
+1.	Click Add Calling.
+2.	Enter the calling title and description.
+3.	Assign a member if applicable.
+4.	Save the record.
+
+Edit a Calling
+1.	Locate the calling in the list.
+2.	Click Edit.
+3.	Update the information.
+4.	Click Save Changes.
+
+Remove a Calling
+1.	Select the calling to remove.
+2.	Click Delete.
+3.	Confirm the deletion when prompted.
+
+Managing Assignments
+The Assignments section helps leaders organize and track responsibilities.
+
+View Assignments
+1.	Open the Assignments page.
+2.	Review all current assignments and their statuses.
+
+Create an Assignment
+1.	Click New Assignment.
+2.	Enter the assignment details.
+3.	Assign it to a member.
+4.	Set a due date.
+5.	Click Save.
+
+Update an Assignment
+1.	Select an assignment from the list.
+2.	Click Edit.
+3.	Modify the details or status.
+4.	Save the changes.
+
+Complete an Assignment
+1.	Open the assignment.
+2.	Change its status to Completed.
+3.	Save the update.
+
+Delete an Assignment
+1.	Select the assignment.
+2.	Click Delete.
+3.	Confirm the action.
+
+Viewing Reports
+The Reports section provides information about ward activities and progress.
+
+Available Reports
+1.	Assignment Status Report
+2.	Overdue Assignment Report
+3.	Open Callings Report
+4.	Member Participation Report
+
+Generate a Report
+1.	Navigate to Reports.
+2.	Select the desired report type.
+3.	Choose any available filters or date ranges.
+4.	Click Generate Report.
+Review Results
+
+Reports display relevant data in a table or summary format that can be used for leadership meetings and planning.
+
+Logging Out
+To securely exit the system:
+1.	Click Logout in the navigation menu.
+2.	Confirm the action if prompted.
+3.	You will be returned to the home page.
+Always log out when using a shared or public computer.
+
+Troubleshooting
+Unable to Log In
+1.	Verify your email address and password.
+2.	Ensure your account has been registered.
+3.	Contact an administrator if the issue persists.
+
+Missing Data
+1.	Refresh the page.
+2.	Confirm that the data was saved successfully.
+3.	Check your internet connection.
+
+Application Errors
+1.	Sign out and sign back in.
+2.	Refresh the browser.
+3.	Contact the system administrator for assistance.
+
+Thank you for using WardSync. The system is designed to simplify ward leadership administration and improve assignment tracking and reporting.
 
