@@ -10,6 +10,8 @@
 @attribute [Authorize(Roles = "Admin,Leader")]
 @inject WardSyncService Service
 
+<PageTitle>Assignments | WardSync</PageTitle>
+
 <h1>Manage Assignments</h1>
 
 @* Navigation button for creating a new assignment *@
@@ -24,13 +26,16 @@
 @* Search and status filtering controls *@
 <div class="filter-row">
     <div class="search-box">
+        <label class="visually-hidden" for="assignment-search">Search assignments</label>
         <span class="search-icon">🔍</span>
 
-        <InputText @bind-Value="searchText"
+        <InputText id="assignment-search"
+                    @bind-Value="searchText"
                     placeholder="Search assignments..." />
     </div>
 
-    <InputSelect @bind-Value="statusFilter">
+    <label class="visually-hidden" for="assignment-status-filter">Filter assignments by status</label>
+    <InputSelect id="assignment-status-filter" @bind-Value="statusFilter">
         <option value="">All Status</option>
         <option value="Open">Open</option>
         <option value="In Progress">In Progress</option>

@@ -26,7 +26,7 @@
     width: 2.6rem;
     height: 2.6rem;
     border-radius: 0.85rem;
-    background: linear-gradient(135deg, #2f80ed 0%, #22a06b 100%);
+    background: linear-gradient(135deg, #1f6fd0 0%, #176b46 100%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -62,12 +62,12 @@
     right: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 0.75rem;
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M5 8h20M5 15h20M5 22h20'/%3e%3c/svg%3e") no-repeat center/1.55rem rgba(255, 255, 255, 0.08);
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.92%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M5 8h20M5 15h20M5 22h20'/%3e%3c/svg%3e") no-repeat center/1.55rem #17395f;
 }
 
 .navbar-toggler:hover,
 .navbar-toggler:focus {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: #1f4f82;
     outline: 3px solid rgba(47, 128, 237, 0.35);
     outline-offset: 2px;
 }
@@ -115,8 +115,8 @@
 
 .nav-item ::deep .nav-link:hover,
 .nav-item ::deep .nav-link:focus {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: #17395f;
+    border-color: #244a73;
     color: #ffffff;
 }
 
@@ -144,7 +144,8 @@
     height: 1.55rem;
     margin-right: 0.75rem;
     border-radius: 0.55rem;
-    background: rgba(255, 255, 255, 0.1);
+    /* Solid icon background avoids translucent contrast false positives. */
+    background: #17395f;
     color: #ffffff;
     display: inline-flex;
     align-items: center;
