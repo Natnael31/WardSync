@@ -154,34 +154,43 @@
 
 
 @code {
-
+    // Stores all assignments retrieved from the database.
     private List<AssignmentItem> assignments = new();
+
+    // Stores all callings retrieved from the database
     private List<Calling> callings = new();
 
-    private int openAssignments;
-    private int completedAssignments;
-    private int overdueAssignments;
-    private int openCallings;
+    private int openAssignments; // Number of assignments with status "Open"
+    private int completedAssignments; // Number of completed assignments
+    private int overdueAssignments; // Number of assignments past due date
+    private int openCallings; // Number of open callings
 
-    private bool ShowNotification { get; set; }
+    private bool ShowNotification { get; set; } // Controls whether the reminder popup is displayed
+
+    // Values displayed inside the reminder popup
     private int PendingAssignments { get; set; }
     private int OverdueAssignments { get; set; }
     private int FollowUpsNeeded { get; set; }
     private int OpenCallings { get; set; }
 
+    // User authentication and authorization flags
     private bool isSignedIn;
     private bool isAdmin;
     private bool isLeader;
     private bool isViewer;
 
+    // Returns only the feature cards the current user is allowed to use.
+    // Guests can see all cards, but cannot open them.
     private List<FeatureCard> VisibleFeatureCards =>
         FeatureCards
             .Where(card => !isSignedIn || card.CanUse(isAdmin, isLeader, isViewer))
             .Select(card => card with { CanOpen = isSignedIn && card.CanUse(isAdmin, isLeader, isViewer) })
             .ToList();
 
+    // Runs when the page is first loaded.
     protected override async Task OnInitializedAsync()
     {
+        // Get the current authentication state.
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -191,22 +200,31 @@
         isLeader = user.IsInRole("Leader");
         isViewer = user.IsInRole("Viewer");
 
+        // Load assignments and callings from the service.
         assignments = await Service.GetAssignmentsAsync();
         callings = await Service.GetCallingsAsync();
 
+        // Calculate assignment statistics.
         openAssignments = assignments.Count(a => a.Status == "Open");
         completedAssignments = assignments.Count(a => a.Status == "Completed");
+
+        // Assignment is overdue if due date has passed and it is not completed
         overdueAssignments = assignments.Count(a =>
             a.DueDate < DateTime.Today &&
             a.Status != "Completed");
 
+        // Calculate number of open callings
         openCallings = callings.Count(c => c.Status == "Open");
 
+        // Set values used by the notification popup
         PendingAssignments = openAssignments;
         OverdueAssignments = overdueAssignments;
         OpenCallings = openCallings;
+
+        // Placeholder for future follow-up tracking.
         FollowUpsNeeded = 0;
 
+        // Show popup if there is anything requiring attention.
         ShowNotification =
             PendingAssignments > 0 ||
             OverdueAssignments > 0 ||
@@ -214,22 +232,26 @@
             FollowUpsNeeded > 0;
     }
 
+    // Hides the notification popup and refreshes the UI
     private async Task CloseNotification()
     {
         ShowNotification = false;
         await InvokeAsync(StateHasChanged);
     }
 
+    // Defines a dashboard feature card.
     private sealed record FeatureCard(
-        string Title,
-        string Description,
-        string IconClass,
-        string Href,
-        Func<bool, bool, bool, bool> CanUse)
+        string Title, // Card title
+        string Description, // Card description
+        string IconClass, // CSS icon class
+        string Href, // Navigation URL
+        Func<bool, bool, bool, bool> CanUse) // Permission check
     {
+        // Determines whether the card can be clicked/opened.
         public bool CanOpen { get; init; }
     }
 
+    // List of available dashboard features and role permissions.
     private static readonly List<FeatureCard> FeatureCards =
     [
         new(
@@ -259,16 +281,22 @@
     ];
 }
 
+<!-- Only users in the Admin role can see this popup -->
 <AuthorizeView Roles="Admin">
     <Authorized>
+        <!-- Display popup only when ShowNotification is true -->
         @if (ShowNotification)
         {
             <div class="modal-overlay">
                 <div class="modal-box">
+
+                    <!-- Popup title -->
                     <h3>Task Reminder</h3>
 
+                    <!-- Summary message -->
                     <p>You currently have:</p>
 
+                    <!-- Task statistics -->
                     <ul>
                         <li>@PendingAssignments pending assignments</li>
                         <li>@OverdueAssignments overdue assignments</li>
@@ -276,6 +304,7 @@
                         <li>@FollowUpsNeeded follow-up items</li>
                     </ul>
 
+                    <!-- Closes the popup when clicked -->
                     <button class="btn btn-primary"
                             @onclick="() => ShowNotification = false">
                         OK
