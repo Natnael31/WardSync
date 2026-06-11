@@ -171,4 +171,47 @@ public class WardSyncService(ApplicationDbContext db)
     // Retrieve all ward members
     public Task<List<Member>> GetMembersAsync() =>
         db.Members.ToListAsync();
+
+    // Retrieve a single ward member by ID
+    public Task<Member?> GetMemberByIdAsync(int id) =>
+        db.Members.FindAsync(id).AsTask();
+
+    // Add a new ward member
+    public async Task AddMemberAsync(Member member)
+    {
+        db.Members.Add(member);
+        await db.SaveChangesAsync();
+    }
+
+    // Update an existing ward member
+    public async Task UpdateMemberAsync(Member member)
+    {
+        var existingMember = await db.Members.FindAsync(member.Id);
+
+        if (existingMember != null)
+        {
+            existingMember.FirstName = member.FirstName;
+            existingMember.LastName = member.LastName;
+            existingMember.Email = member.Email;
+            existingMember.Phone = member.Phone;
+            existingMember.Organization = member.Organization;
+            existingMember.CurrentCalling = member.CurrentCalling;
+            existingMember.AvailabilityNotes = member.AvailabilityNotes;
+            existingMember.ActiveStatus = member.ActiveStatus;
+
+            await db.SaveChangesAsync();
+        }
+    }
+
+    // Delete a ward member by ID
+    public async Task DeleteMemberAsync(int id)
+    {
+        var member = await db.Members.FindAsync(id);
+
+        if (member != null)
+        {
+            db.Members.Remove(member);
+            await db.SaveChangesAsync();
+        }
+    }
 }

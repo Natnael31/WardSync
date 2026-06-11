@@ -5,6 +5,7 @@
     --ws-navy: #0f2742;
     --ws-navy-dark: #0b1f35;
     --ws-blue: #2f80ed;
+    --ws-blue-action: #1f6fd0;
     --ws-blue-dark: #1d4f8f;
     --ws-green: #1f8a5b;
     --ws-green-dark: #176b46;
@@ -305,7 +306,8 @@ textarea {
     BUTTON STYLES
    ================================================== */
 .btn-primary {
-    background: var(--ws-blue);
+    /* Darker action blue keeps white button text readable. */
+    background: var(--ws-blue-action);
     border: none;
     border-radius: 8px;
     color: var(--ws-white);
@@ -381,7 +383,7 @@ textarea {
     justify-content: center;
     max-width: 690px;
     padding: 1.5rem;
-    background: rgba(8, 31, 53, 0.62);
+    background: #081f35;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 14px;
     box-shadow: 0 18px 38px rgba(4, 19, 34, 0.28);
@@ -457,8 +459,8 @@ textarea {
 }
 
 .home-button-primary {
-    background: var(--ws-blue);
-    border-color: var(--ws-blue);
+    background: var(--ws-blue-action);
+    border-color: var(--ws-blue-action);
     color: var(--ws-white);
 }
 
@@ -470,8 +472,8 @@ textarea {
 }
 
 .home-button-login {
-    background: var(--ws-green);
-    border-color: var(--ws-green);
+    background: var(--ws-green-dark);
+    border-color: var(--ws-green-dark);
     color: var(--ws-white);
 }
 
@@ -883,7 +885,7 @@ textarea {
 
 .btn-view:hover,
 .btn-view:focus {
-    background: var(--ws-green);
+    background: var(--ws-green-dark);
     color: white;
     text-decoration: none;
 }
@@ -893,7 +895,7 @@ textarea {
 }
 
 .btn-edit {
-    background: var(--ws-blue);
+    background: var(--ws-blue-action);
     border: none;
     border-radius: 6px;
     color: var(--ws-white);
@@ -907,6 +909,7 @@ textarea {
 .btn-edit:hover,
 .btn-edit:focus {
     background: var(--ws-blue-dark);
+    color: var(--ws-white);
     transform: translateY(-1px);
 }
 
@@ -934,6 +937,18 @@ textarea {
     align-items: center;
     margin-top: 1rem;
     margin-bottom: 1rem;
+}
+
+.empty-state {
+    background: var(--ws-white);
+    border: 1px dashed var(--ws-gray-200);
+    border-radius: 8px;
+    color: var(--ws-gray-600);
+    padding: 1rem 1.25rem;
+}
+
+.checkbox-label input {
+    width: auto;
 }
 
 .filter-row input,
@@ -1095,10 +1110,26 @@ textarea {
 .btn-edit:focus,
 .btn-delete:hover,
 .btn-delete:focus {
-    background: var(--ws-green);
     color: white;
     text-decoration: none;
     transform: translateY(-1px);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-edit:hover,
+.btn-edit:focus {
+    background: var(--ws-blue-dark);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background: var(--ws-gray-800);
+}
+
+.btn-delete:hover,
+.btn-delete:focus {
+    background: #8b1a12;
 }
 
 .table td a,
@@ -1234,7 +1265,10 @@ textarea {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, .5);
+    /* Match the app delete-confirmation overlay and keep modal text legible. */
+    background-color: rgba(15, 39, 66, 0.85);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1492,12 +1526,14 @@ textarea {
 }
 
 .badge-completed,
-.badge-filled {
+.badge-filled,
+.badge-active {
     background: #e3f3eb;
     color: var(--ws-green-dark);
 }
 
-.badge-released {
+.badge-released,
+.badge-inactive {
     background: var(--ws-gray-100);
     color: var(--ws-gray-600);
 }
@@ -1515,6 +1551,37 @@ textarea {
 .badge-priority-low {
     background: var(--ws-gray-100);
     color: var(--ws-gray-600);
+}
+
+/* Dark role badge colors keep admin roster text readable in WAVE checks. */
+.role-badge {
+    color: var(--ws-white);
+}
+
+.role-badge-admin {
+    background: #8b1a12;
+}
+
+.role-badge-leader {
+    background: var(--ws-blue-dark);
+}
+
+.role-badge-viewer {
+    background: var(--ws-gray-800);
+}
+
+/* Target the roster approval link WAVE flagged without changing other outline buttons. */
+.roster-approval-link {
+    background: #ffffff;
+    border-color: var(--ws-blue-dark);
+    color: #12355f;
+}
+
+.roster-approval-link:hover,
+.roster-approval-link:focus {
+    background: #edf5ff;
+    border-color: #12355f;
+    color: var(--ws-navy);
 }
 
 .overdue-date {

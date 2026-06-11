@@ -5,6 +5,8 @@
 
 @attribute [Authorize(Roles = "Admin,Leader")]
 
+<PageTitle>Callings | WardSync</PageTitle>
+
 <h1>Calling Tracker</h1>
 
 @if (showForm)
@@ -107,12 +109,15 @@
 <!-- Filter row for searching and filtering callings -->
 <div class="filter-row">
     <div class="search-box">
+        <label class="visually-hidden" for="calling-search">Search callings</label>
         <span class="search-icon">🔍</span>
-        <InputText @bind-Value="searchText"
+        <InputText id="calling-search"
+                   @bind-Value="searchText"
                    placeholder="Search callings..." />
     </div>
 
-    <InputSelect @bind-Value="statusFilter">
+    <label class="visually-hidden" for="calling-status-filter">Filter callings by status</label>
+    <InputSelect id="calling-status-filter" @bind-Value="statusFilter">
         <option value="">All Status</option>
         <option value="Open">Open</option>
         <option value="Filled">Filled</option>
@@ -155,19 +160,19 @@ else if (FilteredCallings.Any())
                 @foreach (var calling in FilteredCallings)
                 {
                     <tr>
-                        <td>@calling.Title</td
-                        <td>@calling.Organization</td
-                        <td>@calling.MemberAssigned</td
-                        <td>@calling.Status</td
-                        <td>@(calling.NeedsFollowUp ? "Yes" : "No")</td
-                        <td>@(calling.DateExtended?.ToString("yyyy-MM-dd") ?? "-")</td
-                        <td>@(calling.DateSustained?.ToString("yyyy-MM-dd") ?? "-")</td
-                        <td>@(calling.DateReleased?.ToString("yyyy-MM-dd") ?? "-")</td
-                        <td>@calling.Notes</td
+                        <td>@calling.Title</td>
+                        <td>@calling.Organization</td>
+                        <td>@calling.MemberAssigned</td>
+                        <td>@calling.Status</td>
+                        <td>@(calling.NeedsFollowUp ? "Yes" : "No")</td>
+                        <td>@(calling.DateExtended?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td>@(calling.DateSustained?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td>@(calling.DateReleased?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td>@calling.Notes</td>
                         <td>
                             <button class="btn-edit" @onclick="() => EditCalling(calling)">Edit</button>
                             <button class="btn-delete" @onclick="() => DeleteCalling(calling.Id)">Delete</button>
-                         </td
+                         </td>
                     </tr>
                 }
             </tbody>
