@@ -125,7 +125,7 @@
         // Map properties out of user interface data models and onto custom tracking entity
         user.FirstName = Input.FirstName;
         user.LastName = Input.LastName;
-        user.IsApproved = false; // new users have to be approved by an admin before they can sign in
+        user.IsApproved = false; // new users will have to be approved by an admin before they can sign in
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();

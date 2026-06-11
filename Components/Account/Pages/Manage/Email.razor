@@ -22,7 +22,7 @@
         <form @onsubmit="OnSendEmailVerificationAsync" @formname="send-verification" id="send-verification-form" method="post">
             <AntiforgeryToken />
         </form>
-        @* component for handling email changes via POST*@
+        @* component for handling email changes via POST *@
         <EditForm Model="Input" FormName="change-email" OnValidSubmit="OnValidSubmitAsync" method="post">
             @* triggers model validation *@
             <DataAnnotationsValidator />
