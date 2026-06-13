@@ -1,6 +1,7 @@
 # WardSync
 # Deployment Link
-[WardSync](https://wardsync2026-gvfvhjahaxgbgffh.swedencentral-01.azurewebsites.net/)
+(https://wardsync2026-gvfvhjahaxgbgffh.swedencentral-01.azurewebsites.net/)
+
 Section 8 - CSE 325
 
 ## Team Members
